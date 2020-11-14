@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -114,6 +115,7 @@ public class SpdrGldParser {
 					try {
 						spdrGldJson = mapper.writeValueAsString(spdrGld);
 						System.out.println(spdrGldJson);
+						int statusCode = createSpdrGld(spdrGldJson);
 					} catch (JsonProcessingException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -165,5 +167,26 @@ public class SpdrGldParser {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static int createSpdrGld(String spdrGldJson) {
+		String spdrGldUri = "http://localhost:8080/spdrgld";
+		HttpRequest request = HttpRequest.newBuilder() //
+				.POST(BodyPublishers.ofString(spdrGldJson)) //
+				.uri(URI.create(spdrGldUri)) //
+				.header("Content-Type", "application/json") //
+				.setHeader("User-Agent", "SPDR GLD Robot") //
+				.build();
+		try {
+			HttpResponse<Void> response = httpClient.send(request, HttpResponse.BodyHandlers.discarding());
+			return response.statusCode();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 500;
 	}
 }
