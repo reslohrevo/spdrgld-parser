@@ -51,7 +51,16 @@ public class SpdrGldParser {
 	}
 
 	public static void main(String[] args) throws IOException {
+		SpdrGld spdrGldLatest = getLatestSpdrGldFromApi();
+		LocalDate mostRecentNavDate = spdrGldLatest.getDate();
+		System.out.println("Most recent date: " + mostRecentNavDate);
+
+		//System.exit(0);
 		BufferedReader csvData = getSpdrGldNavHistory();
+
+		/*
+		 * The first seven lines of this file is boilerplate and header. Discard.
+		 */
 		IntStream.range(1, 8).forEach(i -> {
 			try {
 				csvData.readLine();
@@ -82,6 +91,7 @@ public class SpdrGldParser {
 				.filter(x -> !x.get(Headers.gldClosePrice).contentEquals("AWAITED")) // New record not yet ready and
 																						// 2018-07-03
 				.filter(x -> !x.get(Headers.gldPremium).contentEquals("AWAITED")) // 2018-07-24 bad value
+				.filter(x -> LocalDate.parse(x.get(Headers.date), dateTimeFormatter).compareTo(mostRecentNavDate) > 0) //
 				.forEach((x) -> {
 					SpdrGld spdrGld = new SpdrGld(//
 							LocalDate.parse(x.get(Headers.date), dateTimeFormatter), //
@@ -116,7 +126,7 @@ public class SpdrGldParser {
 	 * 
 	 * @return Reader
 	 */
-	public static BufferedReader getSpdrGldNavHistory()  {
+	public static BufferedReader getSpdrGldNavHistory() {
 		HttpRequest request = HttpRequest.newBuilder() //
 				.GET() //
 				.uri(URI.create(navHistoryUri)) //
@@ -131,7 +141,29 @@ public class SpdrGldParser {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
+		return null;
+	}
+
+	public static SpdrGld getLatestSpdrGldFromApi() {
+		String spdrGldLatestUri = "http://localhost:8080/spdrgld/latest";
+		HttpRequest request = HttpRequest.newBuilder() //
+				.GET() //
+				.uri(URI.create(spdrGldLatestUri)) //
+				.setHeader("User-Agent", "SPDR GLD Robot") //
+				.build();
+		try {
+			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+			String body = response.body();
+			SpdrGld spdrGld = mapper.readValue(body, SpdrGld.class);
+			return spdrGld;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 }

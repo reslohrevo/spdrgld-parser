@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties("id")
 public class SpdrGld {
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -21,6 +23,8 @@ public class SpdrGld {
 	private BigDecimal navTonnes;
 	private BigDecimal navUsd;
 
+	public SpdrGld() {}
+	
 	public SpdrGld(LocalDate date, BigDecimal gldClosePrice, BigDecimal lbmaGoldPrice,
 			BigDecimal navPerGldInGold, BigDecimal navPerShare, BigDecimal indicativePriceGld,
 			BigDecimal midpointSpread, BigDecimal gldPremium, Long dailyShareVolume, BigDecimal navOunces,
