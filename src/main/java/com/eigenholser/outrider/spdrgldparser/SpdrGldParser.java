@@ -1,7 +1,6 @@
 package com.eigenholser.outrider.spdrgldparser;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -9,18 +8,15 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
-import java.nio.charset.Charset;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -52,6 +48,9 @@ public class SpdrGldParser {
 	}
 
 	public static void main(String[] args) throws IOException {
+		// Process command-line args
+		// SpdrGldProcessor proc = new SpdrGldProcessor();
+		// proc.run()
 		SpdrGld spdrGldLatest = getLatestSpdrGldFromApi();
 		LocalDate mostRecentNavDate = spdrGldLatest.getDate();
 		System.out.println("Most recent date: " + mostRecentNavDate);
@@ -121,6 +120,7 @@ public class SpdrGldParser {
 						e.printStackTrace();
 					}
 				});
+		
 	}
 
 	/**
