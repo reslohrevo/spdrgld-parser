@@ -5,19 +5,15 @@ import java.io.IOException;
 public class SpdrGldParser {
 
 	public static void main(String[] args) throws InterruptedException {
-		
-		Thread t = 
-				new Thread(() -> {
-			SpdrGldProcessor processor = new SpdrGldProcessor();
-			processor.getLatestSpdrGld();
+
+		new Thread(() -> {
 			try {
-				processor.parseSpdrGld();
+				new SpdrGldProcessor().parseSpdrGld();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		});
-		t.start();
-		t.join();
+		}).start();
+		System.out.println("Started Processing");
 	}
-	
+
 }

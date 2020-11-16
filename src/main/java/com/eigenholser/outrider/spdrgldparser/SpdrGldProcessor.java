@@ -43,22 +43,33 @@ public class SpdrGldProcessor {
 
 	private static final String navHistoryUri = "https://www.spdrgoldshares.com/assets/dynamic/GLD/GLD_US_archive_EN.csv";
 
-	public enum Headers {
+	private enum Headers {
 		date, gldClosePrice, lbmaGoldPrice, navPerGldInGold, navPerShare, indicativePriceGld, midpointSpread,
 		gldPremium, dailyShareVolume, navOunces, navTonnes, navUsd;
 	}
 
 	private LocalDate mostRecentNavDate;
 
-	public void getLatestSpdrGld() {
+	private BufferedReader csvData;
+	
+	public SpdrGldProcessor() {
+		mostRecentNavDate = getLatestSpdrGld();
+		System.out.println("Got most recent nav date: " + mostRecentNavDate);
+		csvData = getSpdrGldNavHistory();
+		System.out.println("Got csvData");
+	}
+	
+	public SpdrGldProcessor(LocalDate mostRecentNavDate, BufferedReader csvData) {
+		this.mostRecentNavDate = mostRecentNavDate;
+		this.csvData = csvData;
+	}
+	
+	private LocalDate getLatestSpdrGld() {
 		SpdrGld spdrGldLatest = getLatestSpdrGldFromApi();
-		mostRecentNavDate = spdrGldLatest.getDate();
-		System.out.println("Most recent date: " + mostRecentNavDate);
+		return spdrGldLatest.getDate();
 	}
 
 	public void parseSpdrGld() throws IOException {
-
-		BufferedReader csvData = getSpdrGldNavHistory();
 
 		IntStream.range(1, 8).forEach(i -> {
 			try {
@@ -125,7 +136,7 @@ public class SpdrGldProcessor {
 		return spdrGld;
 	}
 
-	public SpdrGld getLatestSpdrGldFromApi() {
+	private SpdrGld getLatestSpdrGldFromApi() {
 		String spdrGldLatestUri = "http://localhost:8080/spdrgld/latest";
 		HttpRequest request = HttpRequest.newBuilder() //
 				.GET() //
@@ -147,7 +158,7 @@ public class SpdrGldProcessor {
 		return null;
 	}
 
-	public BufferedReader getSpdrGldNavHistory() {
+	private BufferedReader getSpdrGldNavHistory() {
 		HttpRequest request = HttpRequest.newBuilder() //
 				.GET() //
 				.uri(URI.create(navHistoryUri)) //
@@ -166,7 +177,7 @@ public class SpdrGldProcessor {
 		return null;
 	}
 
-	public int createSpdrGld(String spdrGldJson) {
+	private int createSpdrGld(String spdrGldJson) {
 		String spdrGldUri = "http://localhost:8080/spdrgld";
 		HttpRequest request = HttpRequest.newBuilder() //
 				.POST(BodyPublishers.ofString(spdrGldJson)) //
